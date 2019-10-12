@@ -1,0 +1,36 @@
+{
+  "name": "backend-project-lvl3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "NODE_ENV=production babel src --out-dir dist",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaksimPerepeliuk/backend-project-lvl3.git"
+  },
+  "author": "MaksimPerepeliuk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MaksimPerepeliuk/backend-project-lvl3/issues"
+  },
+  "homepage": "https://github.com/MaksimPerepeliuk/backend-project-lvl3#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "commander": "^3.0.2",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/node": "^7.6.3",
+    "@babel/preset-env": "^7.6.3",
+    "eslint": "^6.5.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "jest": "^24.9.0",
+    "nock": "^11.4.0"
+  }
+}
