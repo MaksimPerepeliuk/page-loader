@@ -19,10 +19,6 @@ beforeEach(async () => {
   pathToTmpdir = await fs.mkdtemp(path.join(os.tmpdir(), 'writed3-'));
 });
 
-afterEach(async () => {
-  await fs.rmdir(pathToTmpdir);
-});
-
 nock.disableNetConnect();
 
 test('content loaded page', async () => {
@@ -32,8 +28,7 @@ test('content loaded page', async () => {
     .reply(200, contentTestFile);
     
   const promise = await pageLoader(pathToTmpdir, 'https://hexlet.io/courses');
-  const pageContent = await fs.readFile(path.join(pathToTmpdir, 'hexlet-io-courses.html')); 
-  // заменить имя файла на соотв функцию которая делает это имя из переданного адреса
+  const pageContent = await fs.readFile(path.join(pathToTmpdir, 'hexlet-io-courses.html'), 'utf-8');
 
   expect(pageContent).toEqual(contentTestFile);
 });
