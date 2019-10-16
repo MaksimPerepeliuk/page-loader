@@ -1,15 +1,14 @@
+import os from 'os';
 import nock from 'nock';
-import pageLoader from '../src';
+import axios from 'axios';
 import { promises as fs } from 'fs';
 import path from 'path';
-import _ from 'lodash';
-import axios from 'axios';
-import httpAdapter from 'axios/lib/adapters/http'
-import os from 'os';
+import httpAdapter from 'axios/lib/adapters/http';
+import pageLoader from '../src';
 
 axios.defaults.adapter = httpAdapter;
 
-const getFixturePath = (name) => path.join(__dirname, '..', '__tests__','__fixtures__', name);
+const getFixturePath = (name) => path.join(__dirname, '..', '__tests__', '__fixtures__', name);
 
 let contentTestFile;
 let pathToTmpdir;
@@ -26,8 +25,8 @@ test('content loaded page', async () => {
     .log(console.log)
     .get('/courses')
     .reply(200, contentTestFile);
-    
-  const promise = await pageLoader(pathToTmpdir, 'https://hexlet.io/courses');
+
+  await pageLoader(pathToTmpdir, 'https://hexlet.io/courses');
   const pageContent = await fs.readFile(path.join(pathToTmpdir, 'hexlet-io-courses.html'), 'utf-8');
 
   expect(pageContent).toEqual(contentTestFile);
