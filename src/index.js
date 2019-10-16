@@ -11,5 +11,6 @@ const makeFileName = adress => {
 
 export default (dirPath, adress) => {
   return axios.get(adress)
-    .then(page => fs.writeFile(`${dirPath}/${makeFileName(adress)}`, page.data));
+    .then(page => fs.writeFile(`${dirPath}/${makeFileName(adress)}`, page.data))
+    .catch(console.log)
 };
