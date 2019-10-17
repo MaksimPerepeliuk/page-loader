@@ -20,7 +20,7 @@ beforeEach(async () => {
 
 nock.disableNetConnect();
 
-test('content loaded page', async () => {
+test('page loading at the specified address', async () => {
   nock('https://hexlet.io')
     .log(console.log)
     .get('/courses')

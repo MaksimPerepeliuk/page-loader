@@ -4,8 +4,7 @@ import url from 'url';
 
 const makeFileName = (adress) => {
   const { hostname, pathname } = url.parse(adress);
-  const pathnameWithoutSlashes = pathname.slice(1);
-  const fileName = `${hostname}.${pathnameWithoutSlashes}`.split('.').join('-');
+  const fileName = `${hostname}.${pathname.slice(1)}`.split('.').join('-');
   return `${fileName}.html`;
 };
 
