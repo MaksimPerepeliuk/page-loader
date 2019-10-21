@@ -12,10 +12,12 @@ const getFixturePath = (name) => path.join(__dirname, '..', '__tests__', '__fixt
 
 let contentTestFile;
 let pathToTmpdir;
+let expected;
 
 beforeEach(async () => {
   contentTestFile = await fs.readFile(getFixturePath('test.html'), 'utf-8');
   pathToTmpdir = await fs.mkdtemp(path.join(os.tmpdir(), 'writed-'));
+  expected = await fs.readFile(getFixturePath('expected.html'), 'utf-8');
 });
 
 nock.disableNetConnect();
@@ -28,6 +30,5 @@ test('page loading at the specified address', async () => {
 
   await pageLoader('https://hexlet.io/courses', pathToTmpdir);
   const pageContent = await fs.readFile(path.join(pathToTmpdir, 'hexlet-io-courses.html'), 'utf-8');
-
-  expect(pageContent).toEqual(contentTestFile);
+  expect(pageContent).toEqual(expected);
 });

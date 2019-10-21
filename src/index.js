@@ -2,12 +2,12 @@ import axios from 'axios';
 import { promises as fs } from 'fs';
 import url from 'url';
 
-const makeFileName = (adress) => {
+const makeName = (adress) => {
   const { hostname, pathname } = url.parse(adress);
-  const fileName = `${hostname}.${pathname.slice(1)}`.split('.').join('-');
-  return `${fileName}.html`;
+  const name = `${hostname}.${pathname.slice(1)}`.split('.').join('-');
+  return `${name}.html`;
 };
 
-export default (adress, dirPath) => axios.get(adress)
-  .then((page) => fs.writeFile(`${dirPath}/${makeFileName(adress)}`, page.data))
+export default (adress, outputDir) => axios.get(adress)
+  .then((page) => fs.writeFile(`${outputDir}/${makeName(adress)}`, page.data))
   .catch(console.log);
