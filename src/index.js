@@ -8,6 +8,6 @@ const makeFileName = (adress) => {
   return `${fileName}.html`;
 };
 
-export default (dirPath, adress) => axios.get(adress)
+export default (adress, dirPath) => axios.get(adress)
   .then((page) => fs.writeFile(`${dirPath}/${makeFileName(adress)}`, page.data))
   .catch(console.log);

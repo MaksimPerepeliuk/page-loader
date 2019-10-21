@@ -15,7 +15,7 @@ let pathToTmpdir;
 
 beforeEach(async () => {
   contentTestFile = await fs.readFile(getFixturePath('test.html'), 'utf-8');
-  pathToTmpdir = await fs.mkdtemp(path.join(os.tmpdir(), 'writed3-'));
+  pathToTmpdir = await fs.mkdtemp(path.join(os.tmpdir(), 'writed-'));
 });
 
 nock.disableNetConnect();
@@ -26,7 +26,7 @@ test('page loading at the specified address', async () => {
     .get('/courses')
     .reply(200, contentTestFile);
 
-  await pageLoader(pathToTmpdir, 'https://hexlet.io/courses');
+  await pageLoader('https://hexlet.io/courses', pathToTmpdir);
   const pageContent = await fs.readFile(path.join(pathToTmpdir, 'hexlet-io-courses.html'), 'utf-8');
 
   expect(pageContent).toEqual(contentTestFile);
