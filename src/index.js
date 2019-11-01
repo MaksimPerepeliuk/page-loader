@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import url from 'url';
 import cheerio from 'cheerio';
 import debug from 'debug';
+import path from 'path';
 
 const log = debug('page-loader');
 
@@ -23,6 +24,8 @@ const makeName = (pathTo, type) => {
   }
 };
 
+const makePath = (dirPath, name) => path.join(dirPath, name);
+
 const getLocalLinks = (html) => {
   const localLinks = [];
   const dom = cheerio.load(html);
@@ -32,26 +35,25 @@ const getLocalLinks = (html) => {
   return localLinks;
 };
 
-const changeLocalLinks = (adress, html) => {
+const changeLocalLinks = (dirName, html) => {
   const dom = cheerio.load(html);
   const elementsWithLinks = dom('link').add('img[src]').add('script');
   elementsWithLinks.attr('src', (i, link) => (
-    isLocalLink(link) ? `${makeName(urlWithoutProtocol(adress), 'dir')}${makeName(link.slice(1))}` : null));
+    isLocalLink(link) ? `${dirName}${makeName(link.slice(1))}` : null));
   elementsWithLinks.attr('href', (i, link) => (
-    isLocalLink(link) ? `${makeName(urlWithoutProtocol(adress), 'dir')}${makeName(link.slice(1))}` : null));
+    isLocalLink(link) ? `${dirName}${makeName(link.slice(1))}` : null));
   return dom.html();
 };
 
 export default (adress, outputDir) => {
   log(`start loading page at URL ${adress} to directory ${outputDir}`);
   let html;
-  const mainFilePath = `${outputDir}/${makeName(urlWithoutProtocol(adress), 'html')}`;
-  const localFilesDir = `${outputDir}/${makeName(urlWithoutProtocol(adress), 'dir')}`;
+  const mainFilePath = makePath(outputDir, makeName(urlWithoutProtocol(adress), 'html'));
+  const localFilesDir = makePath(outputDir, makeName(urlWithoutProtocol(adress), 'dir'));
   return axios.get(adress)
     .then((page) => {
       html = page.data;
     })
-    .then(() => fs.writeFile(mainFilePath, html))
     .then(() => fs.mkdir(localFilesDir, { recursive: true }))
     .then(() => getLocalLinks(html).map((link) => axios({
       method: 'get',
@@ -61,10 +63,10 @@ export default (adress, outputDir) => {
     .then((promises) => Promise.all(promises))
     .then((contents) => contents.map((content) => {
       const pathname = url.parse(content.config.url).pathname.slice(1);
-      const filePath = `${localFilesDir}${makeName(pathname, 'link')}`;
+      const filePath = makePath(localFilesDir, makeName(pathname, 'link'));
       log(`loading content by local link - ${content.config.url} to directory - ${localFilesDir}`);
       return fs.writeFile(filePath, content.data);
     }))
-    .then(() => changeLocalLinks(adress, html))
+    .then(() => changeLocalLinks(makeName(urlWithoutProtocol(adress), 'dir'), html))
     .then((newHtml) => fs.writeFile(mainFilePath, newHtml));
 };
