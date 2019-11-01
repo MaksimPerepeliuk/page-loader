@@ -4,7 +4,7 @@ import url from 'url';
 import cheerio from 'cheerio';
 import debug from 'debug';
 
-const logger = debug('page-loader');
+const log = debug('page-loader');
 
 const isLocalLink = (link) => (link ? !link.includes('https://', 0) && !link.includes('http://', 0) : false);
 
@@ -43,7 +43,7 @@ const changeLocalLinks = (adress, html) => {
 };
 
 export default (adress, outputDir) => {
-  logger(`start loading page at URL ${adress} to directory ${outputDir}`);
+  log(`start loading page at URL ${adress} to directory ${outputDir}`);
   let html;
   const mainFilePath = `${outputDir}/${makeName(urlWithoutProtocol(adress), 'html')}`;
   const localFilesDir = `${outputDir}/${makeName(urlWithoutProtocol(adress), 'dir')}`;
@@ -62,10 +62,9 @@ export default (adress, outputDir) => {
     .then((contents) => contents.map((content) => {
       const pathname = url.parse(content.config.url).pathname.slice(1);
       const filePath = `${localFilesDir}${makeName(pathname, 'link')}`;
-      logger(`loading content by local link - ${content.config.url} to directory - ${localFilesDir}`);
+      log(`loading content by local link - ${content.config.url} to directory - ${localFilesDir}`);
       return fs.writeFile(filePath, content.data);
     }))
     .then(() => changeLocalLinks(adress, html))
-    .then((newHtml) => fs.writeFile(mainFilePath, newHtml))
-    .catch(console.log);
+    .then((newHtml) => fs.writeFile(mainFilePath, newHtml));
 };

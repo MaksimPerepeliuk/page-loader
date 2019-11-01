@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`undefined output directory 1`] = `"ENOENT: no such file or directory, open '/undefined/path/hexlet-io-courses.html'"`;
+
+exports[`undefined require resource 1`] = `"Request failed with status code 404"`;

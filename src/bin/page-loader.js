@@ -11,7 +11,10 @@ program
   .option('--output [dirpath]', 'writed a page content in specified file', './')
   .action((adress) => {
     loader(adress, program.output)
-      .catch(console.log)
-      .then(() => console.log(`page ${adress} was loaded in ${program.output}`));
+      .then(() => console.log(`page ${adress} was loaded in ${program.output}`))
+      .catch((err) => {
+        console.error(err.message);
+        process.exit(1);
+      });
   })
   .parse(process.argv);
