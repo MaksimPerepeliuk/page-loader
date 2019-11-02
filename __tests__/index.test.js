@@ -38,7 +38,7 @@ test('page loading at the specified address', async () => {
 });
 
 test('undefined output directory', async () => {
-  await expect(pageLoader('https://hexlet.io/courses', '/undefined/path')).rejects.toThrowErrorMatchingSnapshot();
+  await expect(pageLoader('https://hexlet.io/courses', '/undefined')).rejects.toThrowErrorMatchingSnapshot();
 });
 
 test('undefined require resource', async () => {
