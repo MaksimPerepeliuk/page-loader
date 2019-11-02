@@ -30,18 +30,19 @@ const getLocalLinks = (html) => {
   const localLinks = [];
   const dom = cheerio.load(html);
   const elementsWithLinks = dom('link').add('img[src]').add('script');
-  elementsWithLinks.attr('src', (i, elem) => (isLocalLink(elem) ? localLinks.push(elem) : null));
-  elementsWithLinks.attr('href', (i, elem) => (isLocalLink(elem) ? localLinks.push(elem) : null));
+  const adressAttrs = ['src', 'href'];
+  adressAttrs.forEach((attr) => (
+    elementsWithLinks.attr(attr, (i, elem) => (isLocalLink(elem) ? localLinks.push(elem) : null))));
   return localLinks;
 };
 
 const changeLocalLinks = (dirName, html) => {
   const dom = cheerio.load(html);
   const elementsWithLinks = dom('link').add('img[src]').add('script');
-  elementsWithLinks.attr('src', (i, link) => (
-    isLocalLink(link) ? `${dirName}${makeName(link.slice(1))}` : null));
-  elementsWithLinks.attr('href', (i, link) => (
-    isLocalLink(link) ? `${dirName}${makeName(link.slice(1))}` : null));
+  const adressAttrs = ['src', 'href'];
+  adressAttrs.forEach((attr) => {
+    elementsWithLinks.attr(attr, (i, link) => (isLocalLink(link) ? `${dirName}${makeName(link.slice(1))}` : null));
+  });
   return dom.html();
 };
 
