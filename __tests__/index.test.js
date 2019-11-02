@@ -38,7 +38,9 @@ test('page loading at the specified address', async () => {
 });
 
 test('undefined output directory', async () => {
-  await expect(pageLoader('https://hexlet.io/courses', '/undefined')).rejects.toThrowErrorMatchingSnapshot();
+  await expect(pageLoader('https://hexlet.io/courses', '/undefined'))
+    .rejects
+    .toThrow("ENOENT: no such file or directory, mkdir '/undefined'");
 });
 
 test('undefined require resource', async () => {
