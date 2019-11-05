@@ -4,7 +4,6 @@ import url from 'url';
 import cheerio from 'cheerio';
 import debug from 'debug';
 import path from 'path';
-import Listr from 'listr';
 
 const log = debug('page-loader');
 
