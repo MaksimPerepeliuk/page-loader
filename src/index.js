@@ -19,8 +19,10 @@ const makeName = (pathTo, type) => {
       return `${pathTo.split('.').join('-').split('/').join('-')}.html`;
     case 'dir':
       return `${pathTo.split('.').join('-').split('/').join('-')}_files`;
-    default:
+    case 'link':
       return `/${pathTo.split('/').join('-')}`;
+    default:
+      return null;
   }
 };
 
@@ -42,7 +44,7 @@ const changeLocalLinks = (dirName, html) => {
   const elementsWithLinks = dom('link').add('img[src]').add('script');
   adressAttrs.forEach((attr) => elementsWithLinks.attr(attr, (i, link) => {
     if (isLocalLink(link)) {
-      const filePath = makePath(dirName, makeName(link.slice(1)));
+      const filePath = makePath(dirName, makeName(link.slice(1), 'link'));
       log(`changing the path of a local resource from ${link} to ${filePath}`);
       return filePath;
     }
@@ -53,7 +55,7 @@ const changeLocalLinks = (dirName, html) => {
 
 const loadLocalResources = (links, adress) => links.map((link) => {
   const urlLink = `${adress}${link}`;
-  log(`start loading local resource at ${urlLink}`);
+  log(`start loading local resource at ${urlLink} local link - ${link} url - ${adress}`);
   return axios({
     method: 'get',
     url: urlLink,
@@ -76,7 +78,7 @@ export default (adress, outputDir) => {
     .then((contents) => contents.map((content) => {
       const pathname = url.parse(content.config.url).pathname.slice(1);
       const filePath = makePath(localFilesDir, makeName(pathname, 'link'));
-      log(`loading content by local link - ${content.config.url} and save it in directory - ${localFilesDir}`);
+      log(`loading content by local link - ${content.config.url} and save it into directory - ${localFilesDir}`);
       return fs.writeFile(filePath, content.data);
     }))
     .then(() => changeLocalLinks(makeName(urlWithoutProtocol(adress), 'dir'), html))
