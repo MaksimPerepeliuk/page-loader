@@ -4,6 +4,7 @@ import url from 'url';
 import cheerio from 'cheerio';
 import debug from 'debug';
 import path from 'path';
+import Listr from 'listr';
 
 const log = debug('page-loader');
 
@@ -48,16 +49,6 @@ const changeLocalLinks = (dirName, html) => {
   return dom.html();
 };
 
-const loadLocalResources = (links, adress) => links.map((link) => {
-  const urlLink = `${adress}${link}`;
-  log(`2. start loading content by link ${urlLink}`);
-  return axios({
-    method: 'get',
-    url: urlLink,
-    responseType: 'arraybuffer',
-  });
-});
-
 export default (adress, outputDir) => {
   log(`1. start loading page at URL ${adress} and save it in directory ${outputDir}`);
   let html;
@@ -68,13 +59,18 @@ export default (adress, outputDir) => {
       html = page.data;
     })
     .then(() => fs.mkdir(localFilesDir, { recursive: true }))
-    .then(() => loadLocalResources(getLocalLinks(html), getOriginUrl(adress)))
-    .then((promises) => Promise.all(promises))
-    .then((contents) => contents.map((content) => {
-      const localLink = url.parse(content.config.url).pathname.slice(1);
-      const filePath = path.join(localFilesDir, makeNameFromLocalLink(localLink));
-      log(`3. content from ${content.config.url} save to ${localFilesDir}`);
-      return fs.writeFile(filePath, content.data);
+    .then(() => getLocalLinks(html).map((link) => {
+      const localLink = `${getOriginUrl(adress)}${link}`;
+      const localFilePath = path.join(localFilesDir, makeNameFromLocalLink(localLink));
+      const loadTask = () => axios({
+        method: 'get',
+        url: localLink,
+        responseType: 'arraybuffer',
+      });
+      const title = `loading ${localLink}`;
+      const task = () => loadTask().then((data) => fs.writeFile(localFilePath, data));
+      const tasks = new Listr([{ title, task }]);
+      return tasks.run();
     }))
     .then(() => changeLocalLinks(makeNameFromUrl(adress, 'directory'), html))
     .then((newHtml) => fs.writeFile(htmlFilePath, newHtml))
