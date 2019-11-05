@@ -1,7 +1,7 @@
 {
   "name": "page-loader",
   "version": "1.0.0",
-  "description": "",
+  "description": "[![Build Status](https://travis-ci.com/MaksimPerepeliuk/backend-project-lvl3.svg?branch=master)](https://travis-ci.com/MaksimPerepeliuk/backend-project-lvl3)",
   "main": "dist/index.js",
   "scripts": {
     "build": "NODE_ENV=production babel src --out-dir dist",
@@ -25,14 +25,15 @@
     "cheerio": "^1.0.0-rc.3",
     "commander": "^3.0.2",
     "debug": "^4.1.1",
+    "listr": "^0.14.3",
     "lodash": "^4.17.15",
-    "source-map-support": "^0.5.13"
+    "source-map-support": "^0.5.16"
   },
   "devDependencies": {
-    "@babel/cli": "^7.6.4",
-    "@babel/core": "^7.6.4",
-    "@babel/node": "^7.6.3",
-    "@babel/preset-env": "^7.6.3",
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.0",
+    "@babel/node": "^7.7.0",
+    "@babel/preset-env": "^7.7.1",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
@@ -40,6 +41,6 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^22.21.0",
     "jest": "^24.9.0",
-    "nock": "^11.6.0"
+    "nock": "^11.7.0"
   }
 }

@@ -7,4 +7,6 @@ lint:
 test:
 	npx jest
 
+debug:
+	DEBUG=page-loader npx jest
 
