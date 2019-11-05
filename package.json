@@ -1,7 +1,7 @@
 {
   "name": "page-loader",
   "version": "1.0.0",
-  "description": "",
+  "description": "[![Build Status](https://travis-ci.com/MaksimPerepeliuk/backend-project-lvl3.svg?branch=master)](https://travis-ci.com/MaksimPerepeliuk/backend-project-lvl3)",
   "main": "dist/index.js",
   "scripts": {
     "build": "NODE_ENV=production babel src --out-dir dist",
