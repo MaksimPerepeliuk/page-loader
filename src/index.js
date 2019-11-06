@@ -8,6 +8,7 @@ import Listr from 'listr';
 
 const logs = {
   start: debug('page-loader:START'),
+  find: debug('page-loader:FIND'),
   load: debug('page-loader:LOADING'),
   change: debug('page-loader:CHANGING'),
   write: debug('page-loader:WRITING'),
@@ -36,7 +37,13 @@ const getLocalLinks = (html) => {
   const dom = cheerio.load(html);
   const elementsWithLinks = dom('link').add('img[src]').add('script');
   adressAttributes.forEach((attr) => (
-    elementsWithLinks.attr(attr, (i, elem) => (isLocalLink(elem) ? localLinks.push(elem) : null))));
+    elementsWithLinks.attr(attr, (i, elem) => {
+      if (isLocalLink(elem)) {
+        localLinks.push(elem);
+        logs.find(`found local link - ${elem}`);
+      }
+    })
+  ));
   return localLinks;
 };
 
@@ -46,7 +53,7 @@ const changeLocalLinks = (dirName, html) => {
   adressAttributes.forEach((attr) => elementsWithLinks.attr(attr, (i, link) => {
     if (isLocalLink(link)) {
       const filePath = path.join(dirName, makeNameFromLocalLink(link.slice(1)));
-      logs.change(`changing the path of a local resource from ${link} to ${filePath}`);
+      logs.change(`changing in html: from ${link} to ${filePath}`);
       return filePath;
     }
     return null;
@@ -65,7 +72,7 @@ export default (urlAdress, outputDir) => {
     })
     .then(() => fs.mkdir(localFilesDir, { recursive: true }))
     .then(() => getLocalLinks(html).forEach((link) => {
-      const localLink = `${getOriginUrl(urlAdress)}${link}`;
+      const localLink = url.resolve(getOriginUrl(urlAdress), link);
       const localFilePath = path.join(localFilesDir, makeNameFromLocalLink(link.slice(1)));
       const getPage = () => axios({
         method: 'get',

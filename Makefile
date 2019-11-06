@@ -8,5 +8,5 @@ test:
 	npx jest
 
 debug:
-	DEBUG=page-loader npx jest
+	DEBUG=page-loader:* npx jest
 
