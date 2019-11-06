@@ -13,7 +13,7 @@ const logs = {
   write: debug('page-loader:WRITING'),
 };
 
-const getOriginUrl = (adress) => `${url.parse(adress).protocol}//${url.parse(adress).hostname}`;
+const getOriginUrl = (urlAdress) => `${url.parse(urlAdress).protocol}//${url.parse(urlAdress).hostname}`;
 
 const endings = {
   htmlFile: '.html',
@@ -54,18 +54,18 @@ const changeLocalLinks = (dirName, html) => {
   return dom.html();
 };
 
-export default (adress, outputDir) => {
-  logs.start(`start loading page at URL ${adress} and save it in directory ${outputDir}`);
+export default (urlAdress, outputDir) => {
+  logs.start(`start loading page at URL ${urlAdress} and save it in directory ${outputDir}`);
   let html;
-  const htmlFilePath = path.join(outputDir, makeNameFromUrl(adress, 'htmlFile'));
-  const localFilesDir = path.join(outputDir, makeNameFromUrl(adress, 'directory'));
-  return axios.get(adress)
+  const htmlFilePath = path.join(outputDir, makeNameFromUrl(urlAdress, 'htmlFile'));
+  const localFilesDir = path.join(outputDir, makeNameFromUrl(urlAdress, 'directory'));
+  return axios.get(urlAdress)
     .then((page) => {
       html = page.data;
     })
     .then(() => fs.mkdir(localFilesDir, { recursive: true }))
     .then(() => getLocalLinks(html).forEach((link) => {
-      const localLink = `${getOriginUrl(adress)}${link}`;
+      const localLink = `${getOriginUrl(urlAdress)}${link}`;
       const localFilePath = path.join(localFilesDir, makeNameFromLocalLink(link.slice(1)));
       const getPage = () => axios({
         method: 'get',
@@ -75,12 +75,12 @@ export default (adress, outputDir) => {
       const title = `loading ${localLink}`;
       const task = () => getPage().then((data) => {
         fs.writeFile(localFilePath, data);
-        logs.load(`load ${localLink} and save it in ${localFilePath}`);
       });
+      logs.load(`load ${localLink} and save it in ${localFilePath}`);
       const tasks = new Listr([{ title, task }]);
       tasks.run();
     }))
-    .then(() => changeLocalLinks(makeNameFromUrl(adress, 'directory'), html))
+    .then(() => changeLocalLinks(makeNameFromUrl(urlAdress, 'directory'), html))
     .then((newHtml) => fs.writeFile(htmlFilePath, newHtml)
       .then(() => logs.write(`write html file to ${htmlFilePath}`)));
 };
