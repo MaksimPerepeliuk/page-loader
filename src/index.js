@@ -6,7 +6,12 @@ import debug from 'debug';
 import path from 'path';
 import Listr from 'listr';
 
-const log = debug('page-loader');
+const logs = {
+  start: debug('page-loader:START'),
+  load: debug('page-loader:LOADING'),
+  change: debug('page-loader:CHANGING'),
+  write: debug('page-loader:WRITING'),
+};
 
 const getOriginUrl = (adress) => `${url.parse(adress).protocol}//${url.parse(adress).hostname}`;
 
@@ -41,7 +46,7 @@ const changeLocalLinks = (dirName, html) => {
   adressAttributes.forEach((attr) => elementsWithLinks.attr(attr, (i, link) => {
     if (isLocalLink(link)) {
       const filePath = path.join(dirName, makeNameFromLocalLink(link.slice(1)));
-      log(`changing the path of a local resource from ${link} to ${filePath}`);
+      logs.change(`changing the path of a local resource from ${link} to ${filePath}`);
       return filePath;
     }
     return null;
@@ -50,7 +55,7 @@ const changeLocalLinks = (dirName, html) => {
 };
 
 export default (adress, outputDir) => {
-  log(`start loading page at URL ${adress} and save it in directory ${outputDir}`);
+  logs.start(`start loading page at URL ${adress} and save it in directory ${outputDir}`);
   let html;
   const htmlFilePath = path.join(outputDir, makeNameFromUrl(adress, 'htmlFile'));
   const localFilesDir = path.join(outputDir, makeNameFromUrl(adress, 'directory'));
@@ -67,12 +72,15 @@ export default (adress, outputDir) => {
         url: localLink,
         responseType: 'arraybuffer',
       });
-      const title = `loading ${localLink} and save it in ${localFilePath}`;
-      const task = () => getPage().then((data) => fs.writeFile(localFilePath, data));
+      const title = `loading ${localLink}`;
+      const task = () => getPage().then((data) => {
+        fs.writeFile(localFilePath, data);
+        logs.load(`load ${localLink} and save it in ${localFilePath}`);
+      });
       const tasks = new Listr([{ title, task }]);
       tasks.run();
     }))
     .then(() => changeLocalLinks(makeNameFromUrl(adress, 'directory'), html))
-    .then((newHtml) => fs.writeFile(htmlFilePath, newHtml))
-    .then(() => log(`write html file to ${htmlFilePath}`));
+    .then((newHtml) => fs.writeFile(htmlFilePath, newHtml)
+      .then(() => logs.write(`write html file to ${htmlFilePath}`)));
 };
