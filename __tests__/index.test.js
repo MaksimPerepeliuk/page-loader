@@ -32,18 +32,18 @@ beforeEach(async () => {
 nock.disableNetConnect();
 
 test('page loading at the specified address', async () => {
-  await pageLoader('https://hexlet.io/courses', pathToTmpDir);
+  await pageLoader(pathToTmpDir, 'https://hexlet.io/courses');
   const pageContent = await fs.readFile(path.join(pathToTmpDir, 'hexlet-io-courses.html'), 'utf-8');
   expect(pageContent).toEqual(expected);
 });
 
 test('undefined output directory', async () => {
-  await expect(pageLoader('https://hexlet.io/courses', '/undefined'))
+  await expect(pageLoader('/undefined', 'https://hexlet.io/courses'))
     .rejects
     // почему-то с использованием toThrowErrorMatchingSnapshot не проходит тесты на travis
     .toThrow('ENOENT: no such file or directory, mkdir');
 });
 
 test('undefined require resource', async () => {
-  await expect(pageLoader('https://hexlet.io/undefined', '/tmp')).rejects.toThrowErrorMatchingSnapshot();
+  await expect(pageLoader('/tmp', 'https://hexlet.io/undefined')).rejects.toThrowErrorMatchingSnapshot();
 });

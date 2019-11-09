@@ -61,7 +61,7 @@ const changeLocalLinks = (dirName, html) => {
   return dom.html();
 };
 
-export default (urlAdress, outputDir) => {
+export default (outputDir, urlAdress) => {
   logs.start(`start loading page at URL ${urlAdress} and save it in directory ${outputDir}`);
   let html;
   const htmlFilePath = path.join(outputDir, makeNameFromUrl(urlAdress, 'htmlFile'));
@@ -80,8 +80,8 @@ export default (urlAdress, outputDir) => {
         responseType: 'arraybuffer',
       });
       const title = `loading ${localLink}`;
-      const task = () => getPage().then((data) => {
-        fs.writeFile(localFilePath, data);
+      const task = () => getPage().then((res) => {
+        fs.writeFile(localFilePath, res.data);
       });
       logs.load(`load ${localLink} and save it in ${localFilePath}`);
       const tasks = new Listr([{ title, task }]);

@@ -7,11 +7,11 @@ const program = new commander.Command();
 program
   .version('1.0.0')
   .description('page-loader')
-  .arguments('<adress>')
-  .option('--output [dirpath]', 'writed a page content in specified file', './')
-  .action((adress) => {
-    loader(adress, program.output)
-      .then(() => console.log(`page ${adress} was loaded in ${program.output}`))
+  .arguments('<urlAdress>')
+  .option('--output <dirpath>', 'writed a file contains page content in specified directory', process.cwd())
+  .action((urlAdress) => {
+    loader(program.output, urlAdress)
+      .then(() => console.log(`page ${urlAdress} was loaded in ${program.output}`))
       .catch((err) => {
         console.error(err.message);
         process.exit(1);
