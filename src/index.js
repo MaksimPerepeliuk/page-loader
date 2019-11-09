@@ -73,23 +73,28 @@ export default (outputDir, urlAdress) => {
       html = page.data;
     })
     .then(() => fs.mkdir(localFilesDir, { recursive: true }))
-    .then(() => getLocalLinks(html).forEach((link) => {
-      const localLink = url.resolve(getOriginUrl(urlAdress), link);
-      const localFilePath = path.join(localFilesDir, makeNameFromLocalLink(link.slice(1)));
-      const getPage = () => axios({
+    .then(() => {
+      const localLinks = getLocalLinks(html).map((link) => ({
+        link: url.resolve(getOriginUrl(urlAdress), link),
+        filePath: path.join(localFilesDir, makeNameFromLocalLink(link.slice(1))),
+      }));
+      const getPage = (localLink) => axios({
         method: 'get',
         url: localLink,
         responseType: 'arraybuffer',
       });
-      const title = `loading ${localLink}`;
-      const task = () => getPage().then((res) => {
-        fs.writeFile(localFilePath, res.data);
-      });
-      logs.load(`load ${localLink} and save it in ${localFilePath}`);
-      const tasks = new Listr([{ title, task }]);
+      const tasks = new Listr(
+        localLinks.map(({ link, filePath }) => {
+          const title = `loading ${link}`;
+          const task = () => getPage(link).then((res) => fs.writeFile(filePath, res.data));
+          logs.load(`load ${link} and save it in ${filePath}`);
+          return { title, task };
+        }),
+        { concurrent: true },
+      );
       tasks.run();
-    }))
+    })
     .then(() => changeLocalLinks(makeNameFromUrl(urlAdress, 'directory'), html))
-    .then((newHtml) => fs.writeFile(htmlFilePath, newHtml)
-      .then(() => logs.write(`write html file to ${htmlFilePath}`)));
+    .then((newHtml) => fs.writeFile(htmlFilePath, newHtml))
+    .then(() => logs.write(`write html file to ${htmlFilePath}`));
 };
