@@ -1,3 +1,6 @@
+setup:
+	npm install | npm publish--dry-run | npm link
+
 publish:
 	npm publish --dry-run
 

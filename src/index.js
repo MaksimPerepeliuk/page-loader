@@ -21,8 +21,10 @@ const endings = {
   directory: '_files',
 };
 
+const trimEndSlash = (str) => (str.slice(-1) === '/' ? str.slice(0, -1) : str);
+
 const makeNameFromUrl = (urlAdress, type) => {
-  const urlWithoutProtocol = `${url.parse(urlAdress).hostname}${url.parse(urlAdress).pathname}`;
+  const urlWithoutProtocol = trimEndSlash(`${url.parse(urlAdress).hostname}${url.parse(urlAdress).pathname}`);
   return `${urlWithoutProtocol.split('.').join('-').split('/').join('-')}${endings[type]}`;
 };
 
@@ -53,7 +55,7 @@ const changeLocalLinks = (dirName, html) => {
   adressAttributes.forEach((attr) => elementsWithLinks.attr(attr, (i, link) => {
     if (isLocalLink(link)) {
       const filePath = path.join(dirName, makeNameFromLocalLink(link.slice(1)));
-      logs.change(`changing in html: from ${link} to ${filePath}`);
+      logs.change(`in html file: from ${link} to ${filePath}`);
       return filePath;
     }
     return null;
