@@ -44,26 +44,32 @@ const tagsAttr = {
 const getLocalLinks = (html) => {
   const localLinks = [];
   const dom = cheerio.load(html);
-  Object.keys(tagsAttr).forEach((tag) => dom(tag).attr(tagsAttr[tag], ((i, link) => {
-    if (isLocalLink(link)) {
-      logs.search(`found local link - ${link}`);
-      localLinks.push(link);
-    }
-    return null;
-  })));
+  Object.keys(tagsAttr).forEach((tag) => {
+    const link = dom(tag);
+    link.attr(tagsAttr[tag], ((i, elem) => {
+      if (isLocalLink(elem)) {
+        logs.search(`found local link - ${elem}`);
+        localLinks.push(elem);
+      }
+      return null;
+    }));
+  });
   return localLinks;
 };
 
 const changeLocalLinks = (dirName, html) => {
   const dom = cheerio.load(html);
-  Object.keys(tagsAttr).forEach((tag) => dom(tag).attr(tagsAttr[tag], ((i, link) => {
-    if (isLocalLink(link)) {
-      const newLink = path.join(dirName, makeNameFromLocalLink(link.slice(1)));
-      logs.change(`in html file: from ${link} to ${newLink}`);
-      return newLink;
-    }
-    return null;
-  })));
+  Object.keys(tagsAttr).forEach((tag) => {
+    const link = dom(tag);
+    link.attr(tagsAttr[tag], ((i, elem) => {
+      if (isLocalLink(elem)) {
+        const newLink = path.join(dirName, makeNameFromLocalLink(elem.slice(1)));
+        logs.change(`in html file: from ${elem} to ${newLink}`);
+        return newLink;
+      }
+      return null;
+    }));
+  });
   return dom.html();
 };
 
