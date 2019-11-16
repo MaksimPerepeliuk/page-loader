@@ -8,13 +8,16 @@ import Listr from 'listr';
 
 const logs = {
   start: debug('page-loader:START'),
-  find: debug('page-loader:FIND'),
+  search: debug('page-loader:SEARCH'),
   load: debug('page-loader:LOADING'),
   change: debug('page-loader:CHANGING'),
   write: debug('page-loader:WRITING'),
 };
 
-const getOriginUrl = (urlAdress) => `${url.parse(urlAdress).protocol}//${url.parse(urlAdress).hostname}`;
+const getOriginUrl = (urlAdress) => {
+  const urlParts = url.parse(urlAdress);
+  return `${urlParts.protocol}//${urlParts.hostname}`;
+};
 
 const endings = {
   htmlFile: '.html',
@@ -32,34 +35,35 @@ const makeNameFromLocalLink = (link) => `/${link.split('/').join('-')}`;
 
 const isLocalLink = (link) => link && !url.parse(link).hostname;
 
-const adressAttributes = ['src', 'href'];
+const tagsAttr = {
+  link: 'href',
+  img: 'src',
+  script: 'src',
+};
 
 const getLocalLinks = (html) => {
   const localLinks = [];
   const dom = cheerio.load(html);
-  const elementsWithLinks = dom('link').add('img[src]').add('script');
-  adressAttributes.forEach((attr) => (
-    elementsWithLinks.attr(attr, (i, elem) => {
-      if (isLocalLink(elem)) {
-        localLinks.push(elem);
-        logs.find(`found local link - ${elem}`);
-      }
-    })
-  ));
+  Object.keys(tagsAttr).forEach((tag) => dom(tag).attr(tagsAttr[tag], ((i, link) => {
+    if (isLocalLink(link)) {
+      logs.search(`found local link - ${link}`);
+      localLinks.push(link);
+    }
+    return null;
+  })));
   return localLinks;
 };
 
 const changeLocalLinks = (dirName, html) => {
   const dom = cheerio.load(html);
-  const elementsWithLinks = dom('link').add('img[src]').add('script');
-  adressAttributes.forEach((attr) => elementsWithLinks.attr(attr, (i, link) => {
+  Object.keys(tagsAttr).forEach((tag) => dom(tag).attr(tagsAttr[tag], ((i, link) => {
     if (isLocalLink(link)) {
-      const filePath = path.join(dirName, makeNameFromLocalLink(link.slice(1)));
-      logs.change(`in html file: from ${link} to ${filePath}`);
-      return filePath;
+      const newLink = path.join(dirName, makeNameFromLocalLink(link.slice(1)));
+      logs.change(`in html file: from ${link} to ${newLink}`);
+      return newLink;
     }
     return null;
-  }));
+  })));
   return dom.html();
 };
 
