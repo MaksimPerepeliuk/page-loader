@@ -26,7 +26,7 @@
     "commander": "^3.0.2",
     "debug": "^4.1.1",
     "listr": "^0.14.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "source-map-support": "^0.5.16"
   },
   "devDependencies": {
